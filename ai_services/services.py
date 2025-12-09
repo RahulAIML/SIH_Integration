@@ -5,6 +5,14 @@ from typing import List, Dict, Any
 from models import MatchProfile
 import requests
 import random
+import logging
+
+# Configure Logging
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s - %(levelname)s - %(message)s'
+)
+logger = logging.getLogger(__name__)
 
 # --- Configuration & Key Rotation ---
 GEMINI_API_KEYS = os.getenv("GEMINI_API_KEYS", "").split(",")
@@ -97,10 +105,11 @@ async def generate_chat_response(query: str, context: str = "") -> Dict[str, Any
                 response = requests.post(url, json=payload)
                 
                 if response.status_code == 429: # Rate limit
-                    print(f"Rate limit hit for key ...{api_key[-4:]}, retrying...")
+                    logger.warning(f"Rate limit hit for key ...{api_key[-4:]}, retrying...")
                     continue
                 if response.status_code != 200:
                     last_error = f"API Error: {response.text}"
+                    logger.error(f"API Error with key ...{api_key[-4:]}: {response.text}")
                     continue # Try next key for other errors too, just in case
 
                 data = response.json()
@@ -143,7 +152,7 @@ async def generate_chat_response(query: str, context: str = "") -> Dict[str, Any
                 
         except Exception as e:
             last_error = str(e)
-            print(f"Error with key ...{api_key[-4:]}: {e}. Retrying...")
+            logger.error(f"Error with key ...{api_key[-4:]}: {e}. Retrying...")
             continue
 
     return {
@@ -267,7 +276,7 @@ async def analyze_quality_image(millet_type: str, image_bytes: bytes) -> Dict:
             text = response.text.replace("```json", "").replace("```", "").strip()
             return json.loads(text)
         except Exception as e:
-            print(f"Image analysis error with key: {e}")
+            logger.error(f"Image analysis error with key ...{api_key[-4:]}: {e}")
             continue
 
     return {
