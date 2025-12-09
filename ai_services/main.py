@@ -29,8 +29,10 @@ app = FastAPI(
 # Allow requests from the frontend domain
 origins = [
     "http://localhost:3000",
+    "http://localhost:8080",
+    "http://localhost:5173",
     "https://shree-anna-connect-644bd4aa.base44.app", # Frontend URL
-    "*" # For testing, restrict in production
+    "*"
 ]
 
 app.add_middleware(
