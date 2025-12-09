@@ -1,0 +1,20 @@
+
+# Environment Variables
+.env
+auth.json
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+venv/
+env/
+
+# Node
+node_modules/
+npm-debug.log
+yarn-error.log
+
+# System
+.DS_Store
+Thumbs.db
